@@ -1,11 +1,19 @@
 package com.timetogo.app.ui.home
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import com.timetogo.app.alarm.AlarmScheduler
 import com.timetogo.app.data.model.UserPreferences
 import com.timetogo.app.data.repository.UserPreferencesRepository
+import com.timetogo.app.work.RouteFetchWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val preferencesRepository: UserPreferencesRepository,
     private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
@@ -32,7 +41,9 @@ class HomeViewModel @Inject constructor(
         val statusText: String = "Alarm disabled",
         val hasAddress: Boolean = false,
         val lastFetchFailed: Boolean = false,
-        val lastFetchError: String = ""
+        val lastFetchError: String = "",
+        val isTriggering: Boolean = false,
+        val triggerStatusMessage: String = ""
     )
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -110,6 +121,51 @@ class HomeViewModel @Inject constructor(
         return alarmScheduler.canScheduleExactAlarms()
     }
 
+    fun triggerNotificationNow() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isTriggering = true,
+                triggerStatusMessage = "Enqueuing notification…"
+            )
+
+            try {
+                val prefs = preferencesRepository.getCurrentPreferences()
+
+                if (prefs.homeAddress.isEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        isTriggering = false,
+                        triggerStatusMessage = "Error: Home address not set. Set it first."
+                    )
+                    return@launch
+                }
+
+                val workRequest = OneTimeWorkRequestBuilder<RouteFetchWorker>()
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .addTag("manual_trigger")
+                    .build()
+
+                WorkManager.getInstance(context)
+                    .enqueueUniqueWork(
+                        "manual_route_fetch",
+                        ExistingWorkPolicy.REPLACE,
+                        workRequest
+                    )
+
+                _uiState.value = _uiState.value.copy(
+                    isTriggering = false,
+                    triggerStatusMessage = "Notification enqueued! It should appear shortly."
+                )
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to trigger notification", e)
+                _uiState.value = _uiState.value.copy(
+                    isTriggering = false,
+                    triggerStatusMessage = "Error: ${e.message}"
+                )
+            }
+        }
+    }
+
     private fun getStatusText(prefs: UserPreferences): String {
         if (!prefs.alarmEnabled) return "Alarm disabled"
         if (prefs.homeAddress.isEmpty()) return "Please set your home address"
@@ -126,5 +182,9 @@ class HomeViewModel @Inject constructor(
 
         val dateFormat = SimpleDateFormat("EEEE, HH:mm", Locale.getDefault())
         return "Next notification: ${dateFormat.format(Date(calendar.timeInMillis))}"
+    }
+
+    companion object {
+        private const val TAG = "HomeViewModel"
     }
 }

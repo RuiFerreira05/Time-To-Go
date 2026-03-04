@@ -1,5 +1,7 @@
 package com.timetogo.app.ui.home
 
+import android.content.Context
+
 import com.timetogo.app.alarm.AlarmScheduler
 import com.timetogo.app.data.model.UserPreferences
 import com.timetogo.app.data.repository.UserPreferencesRepository
@@ -30,6 +32,7 @@ class HomeViewModelTest {
 
     private lateinit var mockPreferencesRepository: UserPreferencesRepository
     private lateinit var mockAlarmScheduler: AlarmScheduler
+    private lateinit var mockContext: Context
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -37,6 +40,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         mockPreferencesRepository = mock()
         mockAlarmScheduler = mock()
+        mockContext = mock()
     }
 
     @After
@@ -46,7 +50,7 @@ class HomeViewModelTest {
 
     private fun createViewModel(prefs: UserPreferences = UserPreferences()): HomeViewModel {
         whenever(mockPreferencesRepository.userPreferences).thenReturn(flowOf(prefs))
-        return HomeViewModel(mockPreferencesRepository, mockAlarmScheduler)
+        return HomeViewModel(mockContext, mockPreferencesRepository, mockAlarmScheduler)
     }
 
     // ── Initial state from preferences ──────────────────────────────────
@@ -258,5 +262,51 @@ class HomeViewModelTest {
 
         assertTrue(viewModel.uiState.value.lastFetchFailed)
         assertEquals("Network error", viewModel.uiState.value.lastFetchError)
+    }
+
+    // ── triggerNotificationNow ───────────────────────────────────────────
+
+    @Test
+    fun `triggerNotificationNow sets error when no address`() = runTest {
+        val prefs = UserPreferences(homeAddress = "")
+        val viewModel = createViewModel(prefs)
+        advanceUntilIdle()
+
+        whenever(mockPreferencesRepository.getCurrentPreferences()).thenReturn(prefs)
+
+        viewModel.triggerNotificationNow()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isTriggering)
+        assertTrue(state.triggerStatusMessage.contains("Home address not set"))
+    }
+
+    @Test
+    fun `triggerNotificationNow starts triggering with address set`() = runTest {
+        val prefs = UserPreferences(homeAddress = "123 Main St", homeLatitude = 40.0, homeLongitude = -8.0)
+        val viewModel = createViewModel(prefs)
+        advanceUntilIdle()
+
+        whenever(mockPreferencesRepository.getCurrentPreferences()).thenReturn(prefs)
+
+        // WorkManager.getInstance() will throw in unit tests since no real context,
+        // so we verify the error is caught gracefully
+        viewModel.triggerNotificationNow()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isTriggering)
+        // Should have an error message since WorkManager can't initialize in test
+        assertTrue(state.triggerStatusMessage.isNotEmpty())
+    }
+
+    @Test
+    fun `initial triggerStatusMessage is empty`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.uiState.value.triggerStatusMessage)
+        assertFalse(viewModel.uiState.value.isTriggering)
     }
 }

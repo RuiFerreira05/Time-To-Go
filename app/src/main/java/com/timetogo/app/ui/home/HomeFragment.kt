@@ -174,6 +174,11 @@ class HomeFragment : Fragment() {
         binding.alarmModeGroup.setOnCheckedChangeListener { _, checkedId ->
             viewModel.setRecurring(checkedId == R.id.radio_recurring)
         }
+
+        // Test notification
+        binding.testNotificationButton.setOnClickListener {
+            viewModel.triggerNotificationNow()
+        }
     }
 
     private fun requestPermissions() {
@@ -249,6 +254,16 @@ class HomeFragment : Fragment() {
                     binding.errorBanner.isVisible = state.lastFetchFailed
                     if (state.lastFetchFailed) {
                         binding.errorBannerText.text = getString(R.string.last_fetch_failed)
+                    }
+
+                    // Test notification
+                    binding.testNotificationButton.isEnabled = !state.isTriggering
+                    binding.testNotificationProgress.isVisible = state.isTriggering
+                    if (state.triggerStatusMessage.isNotEmpty()) {
+                        binding.testNotificationStatusText.isVisible = true
+                        binding.testNotificationStatusText.text = state.triggerStatusMessage
+                    } else {
+                        binding.testNotificationStatusText.isVisible = false
                     }
                 }
             }

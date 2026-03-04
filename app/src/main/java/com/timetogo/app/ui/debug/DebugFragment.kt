@@ -47,10 +47,6 @@ class DebugFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.triggerNotificationButton.setOnClickListener {
-            viewModel.triggerNotificationNow()
-        }
-
         binding.clearLogsButton.setOnClickListener {
             viewModel.clearLogs()
         }
@@ -60,16 +56,6 @@ class DebugFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    binding.triggerNotificationButton.isEnabled = !state.isTriggering
-                    binding.notificationProgress.isVisible = state.isTriggering
-
-                    if (state.statusMessage.isNotEmpty()) {
-                        binding.notificationStatusText.isVisible = true
-                        binding.notificationStatusText.text = state.statusMessage
-                    } else {
-                        binding.notificationStatusText.isVisible = false
-                    }
-
                     binding.logText.text = state.logs.ifEmpty { "No logs yet. Trigger a notification to see logs." }
 
                     binding.appStateText.text = state.appState
