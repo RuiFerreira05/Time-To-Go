@@ -278,8 +278,7 @@ class HomeFragment : Fragment() {
             Place.Field.LOCATION
         )
 
-        val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-            .setTypesFilter(listOf("address"))
+        val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
             .build(requireContext())
 
         autocompleteResultLauncher.launch(intent)
