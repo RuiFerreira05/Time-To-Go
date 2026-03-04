@@ -1,12 +1,102 @@
 # Project Memory
 
-This file serves as a shared knowledge base for all agents working on this project. 
+This file serves as a shared knowledge base for all agents working on this project.
 Record important architectural decisions, project conventions, environment setups, and persistent context here.
 
-## Core Information
-- **Project Structure**: Android Application using MVVM, Hilt (Dependency Injection), and Jetpack Compose (UI).
-- **Recent Architectural Changes**: Modified core mock target classes (`UserPreferencesDataStore`, `UserPreferencesRepository`, `AuthRepository`, `AlarmScheduler`) to be `open` to bypass Mockito `mock-maker-inline` crashes running on newer JVM/JDK versions (Java 25).
+## App Overview
+- **App Name**: Time to Go
+- **Purpose**: User signs in with Google, sets a home address (with autocomplete), and configures a daily alarm. When the alarm fires, the app fetches the user's GPS location, queries for public transit (bus-preferred) directions to home, and sends a local push notification with the route summary. Tapping the notification always opens Google Maps with transit directions.
+
+## Technical Stack
+- **Language**: Kotlin only. No Java source files.
+- **UI Framework**: Android XML Views (layouts, fragments, XML resources). **No Jetpack Compose** — not a single `@Composable` function.
+- **Design System**: Material Design 3 (Material You) via `com.google.android.material:material`.
+- **Architecture**: MVVM with ViewModels, StateFlow, and Repository pattern. Clean separation: UI → domain → data.
+- **Build System**: Gradle with **Kotlin DSL** (`build.gradle.kts` only, no Groovy). Version catalog via `gradle/libs.versions.toml`.
+- **Dependency Injection**: Hilt (`@HiltAndroidApp`, `@AndroidEntryPoint`, `@HiltWorker`).
+- **Networking**: Retrofit + OkHttp for REST API calls.
+- **JSON Parsing**: Moshi or Kotlinx.serialization (whichever is used in the project).
+- **Data Persistence**: DataStore (Preferences) for user preferences, home address, alarm config, cached route data, and signed-in user info.
+- **minSdk**: 34 (Android 14). No support below Android 14.
+- **compileSdk / targetSdk**: Latest stable API level.
+
+## Key APIs & Services
+- **Google Sign-In**: Mandatory for app access. Persistent sign-in state. Silent refresh on token expiry.
+- **Google Places SDK**: Autocomplete for home address input.
+- **Google Maps SDK**: For optional map display.
+- **Google Maps Directions API / Routes API (REST)**: For computing transit routes (bus-preferred). One call per alarm trigger.
+- **FusedLocationProviderClient**: For GPS location. Falls back to fresh location update if last known is stale (> 5 min).
+
+## API Cost Awareness
+- Operates on Google Maps Platform **free tier only**.
+- Cache the last fetched route locally (with timestamp).
+- **One API call per alarm trigger**. No polling, no retry loops, no API calls on app launch.
+- On failure, allow ONE manual retry via notification action.
+
+## Background Work & Notifications
+- **AlarmManager** (`setExactAndAllowWhileIdle()`) for daily alarm. Requires `SCHEDULE_EXACT_ALARM` permission.
+- **WorkManager** (expedited `OneTimeWorkRequest`) enqueued by `AlarmReceiver` to fetch route and show notification.
+- **NotificationCompat**: Two display modes (user-configurable):
+  - **Brief**: Bus number(s) + departure time(s) only.
+  - **Detailed (default)**: `BigTextStyle` with full step-by-step route.
+- Tap action opens Google Maps with transit directions.
+- Error notifications include a "Retry" action button (one retry only).
+- `BOOT_COMPLETED` receiver to reschedule alarms after reboot.
+
+## Alarm Modes
+- **Recurring (daily)**: Re-schedules after each fire.
+- **One-shot (default)**: Fires once, then disables itself.
+
+## Screens
+1. **Sign-In Screen**: Google Sign-In button. No app access without sign-in.
+2. **Home Screen**: Greeting, home address input (Places Autocomplete), alarm time picker, alarm enable/disable toggle, recurring/one-shot toggle, next notification status.
+3. **Settings Screen**: Notification display mode (brief/detailed), account info + sign-out, about section with Google Maps attribution.
+
+## Permissions
+- `INTERNET`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION`
+- `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`
+- `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` (for background location in WorkManager)
+
+## Project Structure
+```
+com.timetogo.app/
+├── TimeToGoApplication.kt        // @HiltAndroidApp
+├── MainActivity.kt                // Single Activity host
+├── ui/
+│   ├── signin/   (SignInFragment, SignInViewModel)
+│   ├── home/     (HomeFragment, HomeViewModel)
+│   └── settings/ (SettingsFragment, SettingsViewModel)
+├── data/
+│   ├── repository/ (DirectionsRepository, AuthRepository, UserPreferencesRepository)
+│   ├── remote/     (DirectionsApiService, DTOs)
+│   ├── local/      (UserPreferencesDataStore)
+│   └── model/      (RouteInfo, BusStep, UserPreferences)
+├── di/             (AppModule, NetworkModule)
+├── work/           (RouteFetchWorker)
+├── alarm/          (AlarmScheduler, AlarmReceiver)
+├── notification/   (NotificationHelper)
+├── receiver/       (BootReceiver)
+└── util/           (PermissionHelper, LocationHelper, GoogleMapsIntentBuilder)
+```
+
+## Error Handling Policy
+- **Never fail silently.** Every failure must produce user-visible feedback (notification, snackbar, dialog).
+- Handle: no internet, API errors, location unavailable, no transit routes found, sign-in token expired, permissions revoked.
+
+## Key Constraints (Do NOT Violate)
+- No Jetpack Compose. XML Views only.
+- No Groovy build files. Kotlin DSL only.
+- No hardcoded API keys. Use `local.properties` + `BuildConfig`.
+- No deprecated APIs (`AsyncTask`, legacy support libraries, etc.).
+- No unnecessary API calls. Cache results. No polling.
+- minSdk 34 — no backward compatibility below Android 14.
 
 ## Testing Conventions
 - Use Android's `returnDefaultValues = true` for unit tests needing framework stubs.
-- Mockito's `mock-maker-subclass` has been explicitly configured in `src/test/resources/mockito-extensions` to work smoothly with the `open` classes.
+- Mockito's `mock-maker-subclass` has been explicitly configured in `src/test/resources/mockito-extensions`.
+- Core mock target classes (`UserPreferencesDataStore`, `UserPreferencesRepository`, `AuthRepository`, `AlarmScheduler`) are `open` to bypass Mockito `mock-maker-inline` crashes on newer JVM/JDK versions (Java 25).
+
+## Historical Decisions
+- Added `ACCESS_BACKGROUND_LOCATION` permission and improved `LocationHelper` retry/fallback for reliable background notification delivery.
+- Designed adaptive icon for the app.
+- Fixed Material Dialog cancel button requiring two clicks to dismiss.
