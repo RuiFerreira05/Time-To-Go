@@ -21,7 +21,7 @@ import kotlin.coroutines.resume
  * Wrapper around FusedLocationProviderClient for obtaining the device's current location.
  * Designed to work reliably both in foreground and from background (e.g. WorkManager).
  */
-class LocationHelper @Inject constructor(
+open class LocationHelper @Inject constructor(
     private val context: Context
 ) {
     private val fusedLocationClient: FusedLocationProviderClient =

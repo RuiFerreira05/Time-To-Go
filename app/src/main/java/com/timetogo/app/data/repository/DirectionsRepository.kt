@@ -21,7 +21,7 @@ import javax.inject.Inject
  * BILLABLE API CALL: The computeRoutes method triggers a billable Google Maps Platform API call.
  * This repository should only be invoked from RouteFetchWorker (alarm-triggered) or retry actions.
  */
-class DirectionsRepository @Inject constructor(
+open class DirectionsRepository @Inject constructor(
     private val routesApiService: RoutesApiService
 ) {
     /**

@@ -16,7 +16,7 @@ import javax.inject.Inject
  * Helper for creating and displaying notifications.
  * Handles both success (brief/detailed route) and failure notifications.
  */
-class NotificationHelper @Inject constructor(
+open class NotificationHelper @Inject constructor(
     private val context: Context
 ) {
     companion object {
