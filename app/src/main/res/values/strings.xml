@@ -13,6 +13,7 @@
     <string name="greeting">Hello, %1$s!</string>
     <string name="home_address_label">Home Address</string>
     <string name="home_address_hint">Tap to set your home address</string>
+    <string name="map_selection">Select on map</string>
     <string name="clear_address">Clear address</string>
     <string name="alarm_time_label">Notification Time</string>
     <string name="change_time">Change time</string>

@@ -113,6 +113,14 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/map_selection_button"
+                            style="@style/Widget.Material3.Button.IconButton"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:contentDescription="@string/map_selection"
+                            app:icon="@drawable/ic_location_pin" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/clear_address_button"
                             style="@style/Widget.Material3.Button.IconButton"
                             android:layout_width="48dp"

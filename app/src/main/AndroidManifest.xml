@@ -58,6 +58,12 @@
             </intent-filter>
         </receiver>
 
+        <!-- Map Selection Activity -->
+        <activity
+            android:name=".ui.map.MapSelectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TimeToGo" />
+
         <!-- Google Maps API key (from local.properties via manifest placeholder) -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

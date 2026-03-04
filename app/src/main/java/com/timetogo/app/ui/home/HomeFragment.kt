@@ -32,6 +32,7 @@ import com.timetogo.app.databinding.FragmentHomeBinding
 import com.timetogo.app.util.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.timetogo.app.ui.map.MapSelectionActivity
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -79,6 +80,22 @@ class HomeFragment : Fragment() {
                         "Address search error: ${status.statusMessage}",
                         Snackbar.LENGTH_LONG
                     ).show()
+                }
+            }
+        }
+    }
+
+    // Map Selection launcher
+    private val mapSelectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.let { data ->
+                val address = data.getStringExtra("EXTRA_ADDRESS_NAME") ?: ""
+                val lat = data.getDoubleExtra("EXTRA_LATITUDE", 0.0)
+                val lng = data.getDoubleExtra("EXTRA_LONGITUDE", 0.0)
+                if (lat != 0.0 && lng != 0.0) {
+                    viewModel.setHomeAddress(address, lat, lng)
                 }
             }
         }
@@ -134,6 +151,12 @@ class HomeFragment : Fragment() {
         // Address input — launch Places Autocomplete
         binding.addressEditText.setOnClickListener {
             launchPlacesAutocomplete()
+        }
+
+        // Map selection button
+        binding.mapSelectionButton.setOnClickListener {
+            val intent = android.content.Intent(requireContext(), MapSelectionActivity::class.java)
+            mapSelectionLauncher.launch(intent)
         }
 
         // Clear address

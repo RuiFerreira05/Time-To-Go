@@ -40,4 +40,8 @@
     <style name="Theme.TimeToGo.SignIn" parent="Theme.TimeToGo">
         <item name="android:statusBarColor">@color/gradient_start</item>
     </style>
+
+    <!-- Theme for Google Places Autocomplete Activity to support Dark Mode -->
+    <style name="PlacesAutocompleteTheme" parent="Theme.TimeToGo">
+    </style>
 </resources>
