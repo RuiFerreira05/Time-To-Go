@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom theme attributes for status card colors -->
+    <attr name="statusActiveColor" format="color" />
+    <attr name="statusInactiveColor" format="color" />
+</resources>

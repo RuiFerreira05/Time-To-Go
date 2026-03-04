@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colors -->
+    <color name="primary">#FF1565C0</color>
+    <color name="primary_dark">#FF0D47A1</color>
+    <color name="primary_light">#FF42A5F5</color>
+    <color name="on_primary">#FFFFFFFF</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary">#FF00897B</color>
+    <color name="secondary_dark">#FF00695C</color>
+    <color name="on_secondary">#FFFFFFFF</color>
+
+    <!-- Tertiary colors -->
+    <color name="tertiary">#FF7B1FA2</color>
+    <color name="on_tertiary">#FFFFFFFF</color>
+
+    <!-- Background & Surface -->
+    <color name="background">#FFF5F5F5</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_variant">#FFE8EAF6</color>
+    <color name="on_background">#FF1C1B1F</color>
+    <color name="on_surface">#FF1C1B1F</color>
+    <color name="on_surface_variant">#FF49454F</color>
+
+    <!-- Error -->
+    <color name="error">#FFB3261E</color>
+    <color name="on_error">#FFFFFFFF</color>
+
+    <!-- Outline -->
+    <color name="outline">#FF79747E</color>
+    <color name="outline_variant">#FFCAC4D0</color>
+
+    <!-- Status card colors -->
+    <color name="status_active">#FFE8F5E9</color>
+    <color name="status_inactive">#FFFCE4EC</color>
+
+    <!-- Sign-in screen gradient -->
+    <color name="gradient_start">#FF1565C0</color>
+    <color name="gradient_end">#FF0D47A1</color>
+</resources>

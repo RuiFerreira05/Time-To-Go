@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Time to Go</string>
+
+    <!-- Sign In Screen -->
+    <string name="sign_in_title">Time to Go</string>
+    <string name="sign_in_subtitle">Never miss your bus home</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="skip_sign_in">Continue without sign-in</string>
+    <string name="sign_in_error">Sign-in failed. Please try again.</string>
+
+    <!-- Home Screen -->
+    <string name="greeting">Hello, %1$s!</string>
+    <string name="home_address_label">Home Address</string>
+    <string name="home_address_hint">Tap to set your home address</string>
+    <string name="clear_address">Clear address</string>
+    <string name="alarm_time_label">Notification Time</string>
+    <string name="change_time">Change time</string>
+    <string name="alarm_enabled">Alarm enabled</string>
+    <string name="alarm_mode_label">Alarm Mode</string>
+    <string name="mode_recurring">Recurring (daily)</string>
+    <string name="mode_one_shot">One-shot</string>
+    <string name="status_label">Status</string>
+    <string name="status_next_alarm">Next notification: %1$s</string>
+    <string name="status_alarm_disabled">Alarm disabled</string>
+    <string name="status_no_address">Please set your home address</string>
+    <string name="set_address_first">Please set your home address first.</string>
+    <string name="grant_exact_alarm_permission">Exact alarm permission is required. Tap to grant.</string>
+    <string name="settings">Settings</string>
+    <string name="last_fetch_failed">Last route fetch failed. Check your internet connection.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="notification_mode_label">Notification Display Mode</string>
+    <string name="mode_brief">Brief</string>
+    <string name="mode_detailed">Detailed</string>
+    <string name="brief_preview">\uD83D\uDE8C Next: Bus 42 at 17:35 (~32 min)\n\uD83D\uDE8C After: Bus 15 at 17:50 (~40 min)\n\uD83D\uDE8C After: Bus 42 at 18:05 (~45 min)</string>
+    <string name="detailed_preview">\uD83D\uDEB6 Walk 3 min to Central Station\n\uD83D\uDE8C Bus 42 at 17:35 → Main Street\n\uD83D\uDD04 Transfer: Bus 15 at 17:50 → Home Stop\n\uD83C\uDFE0 Arrive home at ~18:15 (Total: 45 min)</string>
+    <string name="account_section">Account</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="about_section">About</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="google_maps_attribution">This app uses Google Maps Platform services. &lt;a href="https://cloud.google.com/maps-platform/terms"&gt;Terms of Service&lt;/a&gt;</string>
+    <string name="sign_out_confirm">Are you sure you want to sign out?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Debug Screen -->
+    <string name="debug_title">Debug Menu</string>
+    <string name="debug_actions">Actions</string>
+    <string name="debug_trigger_notification">Trigger Notification Now</string>
+    <string name="debug_error_logs">Logs</string>
+    <string name="debug_clear_logs">Clear</string>
+    <string name="debug_no_logs">No logs yet. Trigger a notification to see logs.</string>
+    <string name="debug_app_state">App State</string>
+    <string name="debug_menu">Debug Menu</string>
+</resources>
