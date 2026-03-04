@@ -1,0 +1,12 @@
+# Project Memory
+
+This file serves as a shared knowledge base for all agents working on this project. 
+Record important architectural decisions, project conventions, environment setups, and persistent context here.
+
+## Core Information
+- **Project Structure**: Android Application using MVVM, Hilt (Dependency Injection), and Jetpack Compose (UI).
+- **Recent Architectural Changes**: Modified core mock target classes (`UserPreferencesDataStore`, `UserPreferencesRepository`, `AuthRepository`, `AlarmScheduler`) to be `open` to bypass Mockito `mock-maker-inline` crashes running on newer JVM/JDK versions (Java 25).
+
+## Testing Conventions
+- Use Android's `returnDefaultValues = true` for unit tests needing framework stubs.
+- Mockito's `mock-maker-subclass` has been explicitly configured in `src/test/resources/mockito-extensions` to work smoothly with the `open` classes.

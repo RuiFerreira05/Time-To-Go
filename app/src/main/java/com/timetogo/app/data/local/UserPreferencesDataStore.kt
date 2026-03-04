@@ -22,7 +22,7 @@ import javax.inject.Inject
  */
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
-class UserPreferencesDataStore @Inject constructor(
+open class UserPreferencesDataStore @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     companion object {
@@ -43,7 +43,7 @@ class UserPreferencesDataStore @Inject constructor(
         val LAST_FETCH_ERROR = stringPreferencesKey("last_fetch_error")
     }
 
-    val userPreferences: Flow<UserPreferences> = dataStore.data.map { prefs ->
+    open val userPreferences: Flow<UserPreferences> = dataStore.data.map { prefs ->
         UserPreferences(
             isSignedIn = prefs[IS_SIGNED_IN] ?: false,
             userName = prefs[USER_NAME] ?: "",
@@ -63,7 +63,7 @@ class UserPreferencesDataStore @Inject constructor(
         )
     }
 
-    suspend fun setSignedIn(signedIn: Boolean, name: String, email: String) {
+    open suspend fun setSignedIn(signedIn: Boolean, name: String, email: String) {
         dataStore.edit { prefs ->
             prefs[IS_SIGNED_IN] = signedIn
             prefs[USER_NAME] = name
@@ -71,7 +71,7 @@ class UserPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun clearSignIn() {
+    open suspend fun clearSignIn() {
         dataStore.edit { prefs ->
             prefs[IS_SIGNED_IN] = false
             prefs[USER_NAME] = ""
@@ -79,7 +79,7 @@ class UserPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun setHomeAddress(address: String, latitude: Double, longitude: Double) {
+    open suspend fun setHomeAddress(address: String, latitude: Double, longitude: Double) {
         dataStore.edit { prefs ->
             prefs[HOME_ADDRESS] = address
             prefs[HOME_LATITUDE] = latitude
@@ -87,7 +87,7 @@ class UserPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun clearHomeAddress() {
+    open suspend fun clearHomeAddress() {
         dataStore.edit { prefs ->
             prefs[HOME_ADDRESS] = ""
             prefs[HOME_LATITUDE] = 0.0
@@ -95,32 +95,32 @@ class UserPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun setAlarmTime(hour: Int, minute: Int) {
+    open suspend fun setAlarmTime(hour: Int, minute: Int) {
         dataStore.edit { prefs ->
             prefs[ALARM_HOUR] = hour
             prefs[ALARM_MINUTE] = minute
         }
     }
 
-    suspend fun setAlarmEnabled(enabled: Boolean) {
+    open suspend fun setAlarmEnabled(enabled: Boolean) {
         dataStore.edit { prefs ->
             prefs[ALARM_ENABLED] = enabled
         }
     }
 
-    suspend fun setRecurring(recurring: Boolean) {
+    open suspend fun setRecurring(recurring: Boolean) {
         dataStore.edit { prefs ->
             prefs[IS_RECURRING] = recurring
         }
     }
 
-    suspend fun setDetailedNotification(detailed: Boolean) {
+    open suspend fun setDetailedNotification(detailed: Boolean) {
         dataStore.edit { prefs ->
             prefs[IS_DETAILED_NOTIFICATION] = detailed
         }
     }
 
-    suspend fun cacheRoute(routeJson: String) {
+    open suspend fun cacheRoute(routeJson: String) {
         dataStore.edit { prefs ->
             prefs[LAST_ROUTE_JSON] = routeJson
             prefs[LAST_ROUTE_FETCH_TIME] = System.currentTimeMillis()
@@ -129,14 +129,14 @@ class UserPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun setFetchFailed(error: String) {
+    open suspend fun setFetchFailed(error: String) {
         dataStore.edit { prefs ->
             prefs[LAST_FETCH_FAILED] = true
             prefs[LAST_FETCH_ERROR] = error
         }
     }
 
-    suspend fun clearFetchError() {
+    open suspend fun clearFetchError() {
         dataStore.edit { prefs ->
             prefs[LAST_FETCH_FAILED] = false
             prefs[LAST_FETCH_ERROR] = ""

@@ -117,6 +117,10 @@ This app is designed for the **Google Maps Platform free tier**:
 4. `SCHEDULE_EXACT_ALARM` must be manually granted by the user on Android 14+
 5. Route cache is stored as JSON in DataStore (not a full database)
 
+## Disclaimer
+
+> This project was entirely designed, developed, and documented with the assistance of artificial intelligence. All source code, architecture decisions, UI design, and documentation — including this README — were generated through AI-driven development. Human oversight was provided for review, guidance, and final approval.
+
 ## License
 
 This project is for educational purposes.

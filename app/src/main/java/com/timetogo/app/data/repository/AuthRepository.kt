@@ -20,7 +20,7 @@ import javax.inject.Inject
 /**
  * Repository for Google Sign-In using Credential Manager API.
  */
-class AuthRepository @Inject constructor(
+open class AuthRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val credentialManager = CredentialManager.create(context)
@@ -41,7 +41,7 @@ class AuthRepository @Inject constructor(
      *
      * @param activityContext The Activity context required for Credential Manager UI
      */
-    suspend fun signIn(activityContext: Context): SignInResult {
+    open suspend fun signIn(activityContext: Context): SignInResult {
         if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isEmpty()) {
             Log.e(TAG, "GOOGLE_WEB_CLIENT_ID is not set in local.properties")
             return SignInResult(
@@ -86,7 +86,7 @@ class AuthRepository @Inject constructor(
     /**
      * Attempt a silent sign-in (auto-select a previously authorized account).
      */
-    suspend fun silentSignIn(activityContext: Context): SignInResult {
+    open suspend fun silentSignIn(activityContext: Context): SignInResult {
         if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isEmpty()) {
             return SignInResult(success = false, errorMessage = "Client ID not configured.")
         }
@@ -113,7 +113,7 @@ class AuthRepository @Inject constructor(
     /**
      * Sign out the current user by clearing credential state.
      */
-    suspend fun signOut() {
+    open suspend fun signOut() {
         try {
             credentialManager.clearCredentialState(ClearCredentialStateRequest())
         } catch (e: Exception) {

@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Wrapper around AlarmManager for scheduling and cancelling exact alarms.
  * Uses setExactAndAllowWhileIdle() for reliable delivery even in Doze mode.
  */
-class AlarmScheduler @Inject constructor(
+open class AlarmScheduler @Inject constructor(
     private val context: Context
 ) {
     private val alarmManager: AlarmManager =
@@ -31,7 +31,7 @@ class AlarmScheduler @Inject constructor(
      * @param minute Minute of hour (0-59)
      * @return The scheduled time in milliseconds, or -1 if scheduling failed
      */
-    fun scheduleAlarm(hour: Int, minute: Int): Long {
+    open fun scheduleAlarm(hour: Int, minute: Int): Long {
         if (!alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "Cannot schedule exact alarms — permission not granted")
             return -1
@@ -64,7 +64,7 @@ class AlarmScheduler @Inject constructor(
     /**
      * Cancel any currently scheduled alarm.
      */
-    fun cancelAlarm() {
+    open fun cancelAlarm() {
         val pendingIntent = getAlarmPendingIntent()
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
@@ -78,7 +78,7 @@ class AlarmScheduler @Inject constructor(
      * @param hour Hour of day (0-23)
      * @param minute Minute of hour (0-59)
      */
-    fun scheduleNextDayAlarm(hour: Int, minute: Int): Long {
+    open fun scheduleNextDayAlarm(hour: Int, minute: Int): Long {
         if (!alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "Cannot schedule exact alarms — permission not granted")
             return -1
@@ -107,7 +107,7 @@ class AlarmScheduler @Inject constructor(
     /**
      * Check if exact alarm permission is granted.
      */
-    fun canScheduleExactAlarms(): Boolean {
+    open fun canScheduleExactAlarms(): Boolean {
         return alarmManager.canScheduleExactAlarms()
     }
 
