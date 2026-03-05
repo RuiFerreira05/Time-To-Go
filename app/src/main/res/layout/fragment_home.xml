@@ -5,53 +5,99 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp"
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/transparent"
             app:title="@string/app_name"
-            app:titleTextColor="?attr/colorOnPrimary" />
+            app:titleTextColor="?attr/colorOnBackground"
+            app:titleCentered="true" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="32dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="24dp"
+            android:paddingTop="8dp">
 
             <!-- Greeting -->
             <TextView
                 android:id="@+id/greeting_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:textSize="24sp"
+                android:layout_marginBottom="24dp"
+                android:textSize="32sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground" />
+
+            <!-- Status Card (Pill Shaped) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/status_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/statusActiveColor"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_notification"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/status_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="?attr/colorOnBackground"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Error Banner -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/error_banner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="?attr/statusInactiveColor"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -59,9 +105,74 @@
                     android:id="@+id/error_banner_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="12dp"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="16dp"
                     android:textColor="@color/error"
+                    android:textStyle="bold"
                     android:textSize="14sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Alarm Time Card (Hero element) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/alarm_time_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/alarm_time_label"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/alarm_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="17:30"
+                        android:textSize="64sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/alarm_time_label" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/change_time_button"
+                        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:contentDescription="@string/change_time"
+                        app:icon="@android:drawable/ic_menu_recent_history"
+                        app:iconSize="24dp"
+                        app:iconTint="?attr/colorPrimary"
+                        app:backgroundTint="?attr/colorSurfaceVariant"
+                        app:layout_constraintBottom_toBottomOf="@id/alarm_time_text"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/alarm_time_label" />
+
+                    <!-- Alarm Enable Toggle -->
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/alarm_switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/alarm_enabled"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@id/alarm_time_text" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -69,122 +180,79 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/home_address_label"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
+                    <!-- Sleek pill-shaped address input -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/address_input_layout"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="@string/home_address_hint">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/address_edit_text"
-                                android:layout_width="match_parent"
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="20dp"
+                                android:src="@drawable/ic_location_pin"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/address_input_layout"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:cursorVisible="false"
-                                android:focusable="false"
-                                android:inputType="none" />
+                                android:layout_weight="1"
+                                app:hintEnabled="false"
+                                app:boxBackgroundMode="none">
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/address_edit_text"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/home_address_hint"
+                                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                                    android:cursorVisible="false"
+                                    android:focusable="false"
+                                    android:inputType="none"
+                                    android:paddingVertical="20dp"
+                                    android:paddingHorizontal="16dp"
+                                    android:textSize="16sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
 
-
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/clear_address_button"
-                            style="@style/Widget.Material3.Button.IconButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:contentDescription="@string/clear_address"
-                            android:visibility="gone"
-                            app:icon="@android:drawable/ic_menu_close_clear_cancel" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Alarm Time Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/alarm_time_label"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/alarm_time_text"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="17:30"
-                            android:textSize="48sp"
-                            android:textStyle="bold"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/change_time_button"
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:contentDescription="@string/change_time"
-                            app:icon="@android:drawable/ic_menu_recent_history" />
-
-                    </LinearLayout>
-
-                    <!-- Alarm Enable Toggle -->
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/alarm_switch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/alarm_enabled" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/clear_address_button"
+                                style="@style/Widget.Material3.Button.IconButton"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginEnd="8dp"
+                                android:contentDescription="@string/clear_address"
+                                android:visibility="gone"
+                                app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                                app:iconTint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -194,20 +262,18 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                android:layout_marginBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/alarm_mode_label"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="14sp"
@@ -223,6 +289,8 @@
                             android:id="@+id/radio_one_shot"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingVertical="8dp"
+                            android:textSize="16sp"
                             android:text="@string/mode_one_shot"
                             android:checked="true" />
 
@@ -230,46 +298,11 @@
                             android:id="@+id/radio_recurring"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingVertical="8dp"
+                            android:textSize="16sp"
                             android:text="@string/mode_recurring" />
 
                     </RadioGroup>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Status Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/status_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/statusActiveColor"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="\uD83D\uDD14"
-                        android:textSize="24sp" />
-
-                    <TextView
-                        android:id="@+id/status_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -279,20 +312,18 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
+                        android:layout_marginBottom="8dp"
                         android:text="@string/test_notification_title"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="14sp"
@@ -301,17 +332,19 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/test_notification_description"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/test_notification_button"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="56dp"
                         android:text="@string/test_notification_button"
+                        android:textSize="16sp"
+                        app:cornerRadius="28dp"
                         app:icon="@drawable/ic_notification"
                         app:iconGravity="textStart" />
 
@@ -319,7 +352,7 @@
                         android:id="@+id/test_notification_progress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="16dp"
                         android:visibility="gone"
                         app:trackCornerRadius="4dp" />
 
@@ -327,7 +360,7 @@
                         android:id="@+id/test_notification_status_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="13sp"
                         android:visibility="gone" />

@@ -1,41 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary brand colors -->
-    <color name="primary">#FF1565C0</color>
-    <color name="primary_dark">#FF0D47A1</color>
-    <color name="primary_light">#FF42A5F5</color>
-    <color name="on_primary">#FFFFFFFF</color>
+    <!-- Primary brand colors (Vibrant Orange) -->
+    <color name="primary">#FF6D00</color>
+    <color name="primary_dark">#E65100</color>
+    <color name="primary_light">#FFA000</color>
+    <color name="on_primary">#FFFFFF</color>
 
-    <!-- Secondary colors -->
-    <color name="secondary">#FF00897B</color>
-    <color name="secondary_dark">#FF00695C</color>
-    <color name="on_secondary">#FFFFFFFF</color>
+    <!-- Secondary colors (Dark Grey) -->
+    <color name="secondary">#424242</color>
+    <color name="secondary_dark">#212121</color>
+    <color name="on_secondary">#FFFFFF</color>
 
     <!-- Tertiary colors -->
-    <color name="tertiary">#FF7B1FA2</color>
-    <color name="on_tertiary">#FFFFFFFF</color>
+    <color name="tertiary">#757575</color>
+    <color name="on_tertiary">#FFFFFF</color>
 
-    <!-- Background & Surface -->
-    <color name="background">#FFF5F5F5</color>
-    <color name="surface">#FFFFFFFF</color>
-    <color name="surface_variant">#FFE8EAF6</color>
-    <color name="on_background">#FF1C1B1F</color>
-    <color name="on_surface">#FF1C1B1F</color>
-    <color name="on_surface_variant">#FF49454F</color>
+    <!-- Background & Surface (Black/Deep Grey) -->
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="surface_variant">#2A2A2A</color>
+    <color name="on_background">#F5F5F5</color>
+    <color name="on_surface">#F5F5F5</color>
+    <color name="on_surface_variant">#BDBDBD</color>
 
     <!-- Error -->
-    <color name="error">#FFB3261E</color>
-    <color name="on_error">#FFFFFFFF</color>
+    <color name="error">#CF6679</color>
+    <color name="on_error">#000000</color>
 
     <!-- Outline -->
-    <color name="outline">#FF79747E</color>
-    <color name="outline_variant">#FFCAC4D0</color>
+    <color name="outline">#616161</color>
+    <color name="outline_variant">#424242</color>
 
-    <!-- Status card colors -->
-    <color name="status_active">#FFE8F5E9</color>
-    <color name="status_inactive">#FFFCE4EC</color>
+    <!-- Status card colors (subtle dark tints) -->
+    <color name="status_active">#3E2700</color> <!-- Dark Orange/Amber tint -->
+    <color name="status_inactive">#3E1F1F</color> <!-- Dark Red tint -->
 
     <!-- Sign-in screen gradient -->
-    <color name="gradient_start">#FF1565C0</color>
-    <color name="gradient_end">#FF0D47A1</color>
+    <color name="gradient_start">#FF6D00</color>
+    <color name="gradient_end">#E65100</color>
+
+    <!-- Common text colors for easy reuse -->
+    <color name="text_primary">#F5F5F5</color>
+    <color name="text_secondary">#BDBDBD</color>
 </resources>

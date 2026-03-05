@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 (Material You) Theme -->
-    <style name="Theme.TimeToGo" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Material 3 (Material You) Theme - Sleek Dark Orange/Grey -->
+    <style name="Theme.TimeToGo" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Primary -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -31,17 +31,32 @@
         <item name="statusActiveColor">@color/status_active</item>
         <item name="statusInactiveColor">@color/status_inactive</item>
 
-        <!-- Status bar -->
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:navigationBarColor">@color/surface</item>
+        <!-- Status & Navigation bar -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- Default Card styling for the sleek feel -->
+        <item name="materialCardViewStyle">@style/Widget.TimeToGo.CardView</item>
     </style>
 
-    <!-- Sign-In screen theme with colored background -->
+    <!-- Sleek Custom Cards -->
+    <style name="Widget.TimeToGo.CardView" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cardCornerRadius">24dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- Sign-In screen theme -->
     <style name="Theme.TimeToGo.SignIn" parent="Theme.TimeToGo">
-        <item name="android:statusBarColor">@color/gradient_start</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Theme for Google Places Autocomplete Activity to support Dark Mode -->
+    <!-- Theme for Google Places Autocomplete Activity -->
     <style name="PlacesAutocompleteTheme" parent="Theme.TimeToGo">
     </style>
 </resources>
