@@ -18,10 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -56,34 +52,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Places Autocomplete launcher
-    // BILLABLE API CALL: Place Autocomplete sessions are billed per session.
-    private val autocompleteResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        when (result.resultCode) {
-            Activity.RESULT_OK -> {
-                result.data?.let { data ->
-                    val place = Autocomplete.getPlaceFromIntent(data)
-                    val address = place.formattedAddress ?: place.name ?: ""
-                    val latLng = place.latLng
-                    if (latLng != null) {
-                        viewModel.setHomeAddress(address, latLng.latitude, latLng.longitude)
-                    }
-                }
-            }
-            AutocompleteActivity.RESULT_ERROR -> {
-                result.data?.let { data ->
-                    val status = Autocomplete.getStatusFromIntent(data)
-                    Snackbar.make(
-                        binding.root,
-                        "Address search error: ${status.statusMessage}",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-    }
+
 
     // Map Selection launcher
     private val mapSelectionLauncher = registerForActivityResult(
@@ -148,13 +117,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Address input — launch Places Autocomplete
+        // Address input — launch MapSelectionActivity
         binding.addressEditText.setOnClickListener {
-            launchPlacesAutocomplete()
-        }
-
-        // Map selection button
-        binding.mapSelectionButton.setOnClickListener {
             val intent = android.content.Intent(requireContext(), MapSelectionActivity::class.java)
             mapSelectionLauncher.launch(intent)
         }
@@ -293,19 +257,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun launchPlacesAutocomplete() {
-        val fields = listOf(
-            Place.Field.ID,
-            Place.Field.FORMATTED_ADDRESS,
-            Place.Field.NAME,
-            Place.Field.LOCATION
-        )
 
-        val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
-            .build(requireContext())
-
-        autocompleteResultLauncher.launch(intent)
-    }
 
     private fun showTimePicker() {
         val state = viewModel.uiState.value

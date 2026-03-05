@@ -8,6 +8,20 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.EditText
+import android.view.inputmethod.InputMethodManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
+import com.timetogo.app.BuildConfig
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,6 +53,14 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
     private var currentLatLng = defaultLocation
     private var currentAddressName: String? = null
     
+    // Search properties
+    private lateinit var searchEditText: EditText
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: PlacePredictionAdapter
+    private lateinit var placesClient: PlacesClient
+    private var sessionToken: AutocompleteSessionToken? = null
+    private var isProgrammaticTextChange = false
+    
     private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +72,24 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map_selection)
 
         selectButton = findViewById(R.id.select_location_button)
-        addressTextView = findViewById(R.id.address_text)
+        searchEditText = findViewById(R.id.search_edit_text)
+        recyclerView = findViewById(R.id.recycler_view_predictions)
         geocoder = Geocoder(this, Locale.getDefault())
+        
+        // Initialize Places logic
+        if (!Places.isInitialized()) {
+            Places.initializeWithNewPlacesApiEnabled(this, BuildConfig.MAPS_API_KEY)
+        }
+        placesClient = Places.createClient(this)
+        sessionToken = AutocompleteSessionToken.newInstance()
+        
+        adapter = PlacePredictionAdapter { prediction ->
+            handlePredictionSelection(prediction)
+        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+        
+        setupSearchEditText()
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -83,9 +121,90 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         
         map.setOnCameraMoveStartedListener {
-            addressTextView.text = "Searching..."
+            isProgrammaticTextChange = true
+            searchEditText.setText("Searching...")
+            isProgrammaticTextChange = false
             selectButton.isEnabled = false
+            
+            // Hide search list if user interacts with map
+            if (recyclerView.visibility == View.VISIBLE) {
+                recyclerView.visibility = View.GONE
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                searchEditText.clearFocus()
+            }
         }
+    }
+
+    private fun setupSearchEditText() {
+        searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (isProgrammaticTextChange) return
+                
+                val query = s?.toString() ?: ""
+                if (query.length > 2) {
+                    performSearch(query)
+                } else {
+                    recyclerView.visibility = View.GONE
+                    adapter.submitList(emptyList())
+                }
+            }
+        })
+    }
+
+    private fun performSearch(query: String) {
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setSessionToken(sessionToken)
+            .setQuery(query)
+            .build()
+            
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                val predictions = response.autocompletePredictions
+                if (predictions.isNotEmpty()) {
+                    adapter.submitList(predictions)
+                    recyclerView.visibility = View.VISIBLE
+                } else {
+                    recyclerView.visibility = View.GONE
+                }
+            }
+            .addOnFailureListener {
+                Log.e("MapSelectionActivity", "Error finding predictions", it)
+            }
+    }
+
+    private fun handlePredictionSelection(prediction: com.google.android.libraries.places.api.model.AutocompletePrediction) {
+        // Hide keyboard
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+        
+        recyclerView.visibility = View.GONE
+        
+        // Set text without triggering search
+        isProgrammaticTextChange = true
+        searchEditText.setText(prediction.getPrimaryText(null))
+        searchEditText.setSelection(searchEditText.text.length)
+        isProgrammaticTextChange = false
+        
+        // Fetch LatLng
+        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LOCATION)
+        val request = FetchPlaceRequest.newInstance(prediction.placeId, placeFields)
+        
+        placesClient.fetchPlace(request)
+            .addOnSuccessListener { response ->
+                val place = response.place
+                place.latLng?.let { latLng ->
+                    currentAddressName = place.name ?: prediction.getPrimaryText(null).toString()
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                    // A new search session starts after a selection
+                    sessionToken = AutocompleteSessionToken.newInstance()
+                }
+            }
+            .addOnFailureListener {
+                Log.e("MapSelectionActivity", "Error fetching place details", it)
+            }
     }
 
     private fun updateAddressForLocation(latLng: LatLng) {
@@ -95,11 +214,15 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (address != null) {
                     val addressText = address.getAddressLine(0)
                     currentAddressName = addressText
-                    addressTextView.text = addressText
+                    isProgrammaticTextChange = true
+                    searchEditText.setText(addressText)
+                    isProgrammaticTextChange = false
                     selectButton.isEnabled = true
                 } else {
                     currentAddressName = "${latLng.latitude}, ${latLng.longitude}"
-                    addressTextView.text = "Unknown location\n${latLng.latitude}, ${latLng.longitude}"
+                    isProgrammaticTextChange = true
+                    searchEditText.setText("${latLng.latitude}, ${latLng.longitude}")
+                    isProgrammaticTextChange = false
                     selectButton.isEnabled = true
                 }
             }
