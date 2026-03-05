@@ -13,6 +13,10 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.view.inputmethod.InputMethodManager
+import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.libraries.places.api.Places
@@ -61,6 +65,10 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
     private var sessionToken: AutocompleteSessionToken? = null
     private var isProgrammaticTextChange = false
     
+    // Insets handling to not consume them more than once dynamically
+    private var isSearchCardInsetApplied = false
+    private var isSelectButtonInsetApplied = false
+
     private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,8 +81,32 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
 
         selectButton = findViewById(R.id.select_location_button)
         searchEditText = findViewById(R.id.search_edit_text)
+        val searchCard: View = findViewById(R.id.search_card)
         recyclerView = findViewById(R.id.recycler_view_predictions)
         geocoder = Geocoder(this, Locale.getDefault())
+        
+        // Handle window insets so UI doesn't overlap with system bars
+        ViewCompat.setOnApplyWindowInsetsListener(searchCard) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            if (!isSearchCardInsetApplied) {
+                v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin += insets.top
+                }
+                isSearchCardInsetApplied = true
+            }
+            windowInsets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(selectButton) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            if (!isSelectButtonInsetApplied) {
+                v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    bottomMargin += insets.bottom
+                }
+                isSelectButtonInsetApplied = true
+            }
+            windowInsets
+        }
         
         // Initialize Places logic
         if (!Places.isInitialized()) {
@@ -120,18 +152,20 @@ class MapSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
             updateAddressForLocation(currentLatLng)
         }
         
-        map.setOnCameraMoveStartedListener {
-            isProgrammaticTextChange = true
-            searchEditText.setText("Searching...")
-            isProgrammaticTextChange = false
-            selectButton.isEnabled = false
-            
-            // Hide search list if user interacts with map
-            if (recyclerView.visibility == View.VISIBLE) {
-                recyclerView.visibility = View.GONE
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-                searchEditText.clearFocus()
+        map.setOnCameraMoveStartedListener { reason ->
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                isProgrammaticTextChange = true
+                searchEditText.setText("Searching...")
+                isProgrammaticTextChange = false
+                selectButton.isEnabled = false
+                
+                // Hide search list if user interacts with map
+                if (recyclerView.visibility == View.VISIBLE) {
+                    recyclerView.visibility = View.GONE
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                    searchEditText.clearFocus()
+                }
             }
         }
     }
