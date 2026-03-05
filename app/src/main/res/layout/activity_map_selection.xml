@@ -48,6 +48,7 @@
                 android:drawableTint="?attr/colorOnSurfaceVariant"
                 android:hint="Search or move map..."
                 android:inputType="textPostalAddress"
+                android:selectAllOnFocus="true"
                 android:maxLines="1"
                 android:padding="16dp"
                 android:textColor="?attr/colorOnSurface"
