@@ -11,7 +11,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.timetogo.app.BuildConfig
 import com.timetogo.app.R
 import com.timetogo.app.databinding.FragmentSettingsBinding
@@ -89,18 +88,6 @@ class SettingsFragment : Fragment() {
         // Notification mode
         binding.notificationModeGroup.setOnCheckedChangeListener(notificationModeListener)
 
-        // Sign out
-        binding.signOutButton.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Sign Out")
-                .setMessage(R.string.sign_out_confirm)
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    viewModel.signOut()
-                }
-                .setNegativeButton(R.string.no, null)
-                .show()
-        }
-
         // Debug menu
         binding.debugButton.setOnClickListener {
             findNavController().navigate(R.id.action_settings_to_debug)
@@ -126,17 +113,6 @@ class SettingsFragment : Fragment() {
                     binding.radioDetailed.jumpDrawablesToCurrentState()
                     binding.radioBrief.jumpDrawablesToCurrentState()
 
-                    // Re-attach listener
-                    binding.notificationModeGroup.setOnCheckedChangeListener(notificationModeListener)
-
-                    // Account info
-                    binding.accountName.text = state.userName
-                    binding.accountEmail.text = state.userEmail
-
-                    // Sign out navigation
-                    if (state.isSignedOut) {
-                        findNavController().navigate(R.id.action_settings_to_signIn)
-                    }
                 }
             }
         }

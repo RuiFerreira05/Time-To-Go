@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import com.timetogo.app.alarm.AlarmScheduler
 import com.timetogo.app.data.local.UserPreferencesDataStore
 import com.timetogo.app.data.local.dataStore
-import com.timetogo.app.data.repository.AuthRepository
 import com.timetogo.app.data.repository.UserPreferencesRepository
 import com.timetogo.app.notification.NotificationHelper
 import com.timetogo.app.util.GoogleMapsIntentBuilder
@@ -37,12 +36,6 @@ object AppModule {
     @Singleton
     fun provideUserPreferencesRepository(dataStore: UserPreferencesDataStore): UserPreferencesRepository {
         return UserPreferencesRepository(dataStore)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(@ApplicationContext context: Context): AuthRepository {
-        return AuthRepository(context)
     }
 
     @Provides

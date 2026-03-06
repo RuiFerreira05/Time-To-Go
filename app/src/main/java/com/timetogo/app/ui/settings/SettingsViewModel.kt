@@ -3,7 +3,6 @@ package com.timetogo.app.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.timetogo.app.alarm.AlarmScheduler
-import com.timetogo.app.data.repository.AuthRepository
 import com.timetogo.app.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,15 +14,11 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository,
-    private val authRepository: AuthRepository,
     private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     data class SettingsUiState(
-        val isDetailedNotification: Boolean = true,
-        val userName: String = "",
-        val userEmail: String = "",
-        val isSignedOut: Boolean = false
+        val isDetailedNotification: Boolean = true
     )
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -37,9 +32,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             preferencesRepository.userPreferences.collect { prefs ->
                 _uiState.value = SettingsUiState(
-                    isDetailedNotification = prefs.isDetailedNotification,
-                    userName = prefs.userName,
-                    userEmail = prefs.userEmail
+                    isDetailedNotification = prefs.isDetailedNotification
                 )
             }
         }
@@ -54,10 +47,8 @@ class SettingsViewModel @Inject constructor(
     fun signOut() {
         viewModelScope.launch {
             alarmScheduler.cancelAlarm()
-            authRepository.signOut()
             preferencesRepository.signOut()
             preferencesRepository.setAlarmEnabled(false)
-            _uiState.value = _uiState.value.copy(isSignedOut = true)
         }
     }
 }
